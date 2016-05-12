@@ -36,8 +36,8 @@ public class RandomNumberListener implements ServletContextListener {
     }
 
     public List<Long> getAfter(long after) {
-        return numbersByTimestamp.entrySet().stream()
-                .filter(longLongEntry -> longLongEntry.getKey() > after)
+        return numbersByTimestamp.tailMap(after)
+                .entrySet().stream()
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
