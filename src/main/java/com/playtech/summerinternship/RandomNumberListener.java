@@ -31,6 +31,8 @@ public class RandomNumberListener implements ServletContextListener {
     }
 
     public List<Long> getAfter(long after) {
-        return new ArrayList<>(numbersByTimestamp.tailMap(after).values()); // synchronized implicitly
+        synchronized (numbersByTimestamp) { // better safe than sorry, avoid relying on implementation detail of Synchronized*
+            return new ArrayList<>(numbersByTimestamp.tailMap(after).values()); // synchronized implicitly (?)
+        }
     }
 }
