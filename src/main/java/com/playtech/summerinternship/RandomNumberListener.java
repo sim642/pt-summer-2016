@@ -8,17 +8,12 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @WebListener
 public class RandomNumberListener implements ServletContextListener {
     private static final Random RANDOM = new Random();
 
-    private final SortedMap<Long, Long> numbersByTimestamp;
-
-    public RandomNumberListener() {
-        this.numbersByTimestamp = new TreeMap<>();
-    }
+    private final SortedMap<Long, Long> numbersByTimestamp = Collections.synchronizedSortedMap(new TreeMap<>());
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -26,7 +21,7 @@ public class RandomNumberListener implements ServletContextListener {
 
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(() -> {
-            numbersByTimestamp.put(Instant.now().getEpochSecond(), RANDOM.nextLong());
+            numbersByTimestamp.put(Instant.now().getEpochSecond(), RANDOM.nextLong()); // synchronized implicitly
         }, 0, 1, TimeUnit.SECONDS);
     }
 
@@ -36,9 +31,6 @@ public class RandomNumberListener implements ServletContextListener {
     }
 
     public List<Long> getAfter(long after) {
-        return numbersByTimestamp.tailMap(after)
-                .entrySet().stream()
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
+        return new ArrayList<>(numbersByTimestamp.tailMap(after).values()); // synchronized implicitly
     }
 }
