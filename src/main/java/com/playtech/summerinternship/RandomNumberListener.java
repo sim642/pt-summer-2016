@@ -3,8 +3,7 @@ package com.playtech.summerinternship;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,7 +26,7 @@ public class RandomNumberListener implements ServletContextListener {
 
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(() -> {
-            numbersByTimestamp.put(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), RANDOM.nextLong());
+            numbersByTimestamp.put(Instant.now().getEpochSecond(), RANDOM.nextLong());
         }, 0, 1, TimeUnit.SECONDS);
     }
 
